@@ -1,0 +1,1 @@
+web: ./build/install/FigmaToCompose/bin/FigmaToCompose
