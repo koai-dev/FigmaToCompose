@@ -158,7 +158,7 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
             var gradientTransform: ArrayList<ArrayList<Double>>? = null
     ) : ChainableModifier() {
         override fun addToChain(acc: String) = acc + ".background".args(
-                "HorizontalGradient".args(
+                "Brush.horizontalGradient".args(
                         stops.joinToString { "${it.position}f to ${it.color?.toComposeColor()}" },
                         "startX = 0f",
                         "endX = ${width}.dp.value.toFloat()"
