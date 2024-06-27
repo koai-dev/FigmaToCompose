@@ -1,3 +1,5 @@
+import org.codehaus.groovy.ast.tools.GeneralUtils.args
+
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.8.0"
@@ -57,4 +59,11 @@ tasks {
 
 tasks {
     create("stage").dependsOn("installDist")
+}
+
+tasks.register<JavaExec>("runServer") {
+    description = "Run Server"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("app.roomtorent.figmatocompose.EngineMain")
+    args("-config=application.conf")
 }
