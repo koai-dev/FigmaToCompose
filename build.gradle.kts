@@ -57,9 +57,9 @@ tasks {
     }
 }
 
-//tasks {
-//    create("stage").dependsOn("installDist")
-//}
+tasks {
+    create("stage").dependsOn("installDist")
+}
 
 tasks.register<JavaExec>("runServer") {
     description = "Run Server"
