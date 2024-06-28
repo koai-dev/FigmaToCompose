@@ -51,15 +51,15 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions.apiVersion = "1.8"
-        kotlinOptions.languageVersion = "1.8"
-    }
-}
+//tasks {
+//    compileKotlin {
+//        kotlinOptions.apiVersion = "1.8"
+//        kotlinOptions.languageVersion = "1.8"
+//    }
+//}
 
 tasks {
-    create("stage").dependsOn("installDist")
+    create("stage").dependsOn("installDist").dependsOn("runServer")
 }
 
 tasks.register<JavaExec>("runServer") {
