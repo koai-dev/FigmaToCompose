@@ -45,26 +45,12 @@ dependencies {
 }
 
 application {
-    mainClass.set("app.roomtorent.figmatocompose.EngineMain")
+    mainClass.set("app.roomtorent.figmatocompose.EngineMainKt")
 
     val isDevelopment: Boolean = false
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-//tasks {
-//    compileKotlin {
-//        kotlinOptions.apiVersion = "1.8"
-//        kotlinOptions.languageVersion = "1.8"
-//    }
-//}
-
 tasks {
-    create("stage").dependsOn("installDist").dependsOn("runServer")
-}
-
-tasks.register<JavaExec>("runServer") {
-    description = "Run Server"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("app.roomtorent.figmatocompose.EngineMain")
-    args("-config=application.conf")
+    create("stage").dependsOn("installDist")
 }

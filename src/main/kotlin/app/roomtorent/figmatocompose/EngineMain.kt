@@ -4,48 +4,13 @@
 
 package app.roomtorent.figmatocompose
 
-import io.ktor.server.config.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.jetty.*
-import java.util.concurrent.TimeUnit
 
-/**
- * Jetty engine
- */
-object EngineMain {
-    /**
-     * Main function for starting EngineMain with Jetty
-     * Creates an embedded Jetty application with an environment built from command line arguments.
-     */
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val applicationEnvironment = commandLineEnvironment(args)
-        val engine = JettyApplicationEngine(applicationEnvironment) { loadConfiguration(applicationEnvironment.config) }
-        engine.addShutdownHook {
-            engine.stop(3, 5, TimeUnit.SECONDS)
-        }
-        engine.start(true)
-    }
-
-    private fun JettyApplicationEngineBase.Configuration.loadConfiguration(config: ApplicationConfig) {
-        val deploymentConfig = config.config("ktor.deployment")
-        loadCommonConfiguration(deploymentConfig)
-    }
-}
-
-// fun main() {
-//    embeddedServer(Jetty, port = 8080, host = "0.0.0.0", watchPaths = listOf("classes")) {
-//
-//    }.start(true)
-// }
-
-@Suppress("KDocMissingDocumentation")
-@Deprecated(
-    "Use EngineMain instead",
-    replaceWith = ReplaceWith("EngineMain"),
-    level = DeprecationLevel.HIDDEN,
-)
-object DevelopmentEngine {
-    @JvmStatic
-    fun main(args: Array<String>): Unit = EngineMain.main(args)
+fun main() {
+    embeddedServer(
+        Jetty, port = 8080, host = "0.0.0.0",
+        watchPaths = listOf("classes"), module = Application::main
+    ).start(true)
 }
