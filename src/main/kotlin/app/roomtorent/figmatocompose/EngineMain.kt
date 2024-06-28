@@ -7,10 +7,11 @@ package app.roomtorent.figmatocompose
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.jetty.*
+import io.ktor.server.netty.*
 
 fun main() {
     embeddedServer(
-        Jetty, port = 8080, host = "0.0.0.0",
+        Netty, port = 8080, host = "0.0.0.0",
         watchPaths = listOf("classes"), module = Application::main
     ).start(true)
 }
