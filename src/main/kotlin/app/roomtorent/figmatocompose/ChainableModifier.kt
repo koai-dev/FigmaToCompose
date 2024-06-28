@@ -16,26 +16,31 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     val inheritedModifiers: ArrayList<ChainableModifier>
 
     fun getBuiltOptimized(): String {
-        var combined = ownModifiers.apply { if (this.isNotEmpty() && inheritedModifiers.isNotEmpty()) add(CustomModSeparator()) } + inheritedModifiers
+        var combined =
+            ownModifiers.apply {
+                if (this.isNotEmpty() && inheritedModifiers.isNotEmpty()) add(CustomModSeparator())
+            } + inheritedModifiers
         if (combined.filterNot { it is CustomModSeparator || it is None }.isEmpty()) return "Modifier"
         if (Settings.Optimizations.omitExtraShadows) {
-            val biggestShadow: Shadow? = combined
+            val biggestShadow: Shadow? =
+                combined
                     .filterIsInstance<Shadow>()
                     .maxByOrNull { it.dp }
             if (biggestShadow != null) {
-                val withOnlyBiggestShadow: List<ChainableModifier> = combined
+                val withOnlyBiggestShadow: List<ChainableModifier> =
+                    combined
                         .filter { it !is Shadow }
                         .apply { (this as ArrayList<ChainableModifier>).add(biggestShadow) }
                 combined = withOnlyBiggestShadow
             }
         }
-        //Make sure that given equal order, clips come first
+        // Make sure that given equal order, clips come first
         val (clips, notClips) = combined.partition { it is CornerRadius || it is RectangleCornerRadius }
         val clipsFirst = clips + notClips
         val clipsFirstSorted = clipsFirst.sortedBy { it.order }
         return clipsFirstSorted.fold("Modifier") { acc, chainableModifier: ChainableModifier ->
             chainableModifier.addToChain(
-                    acc
+                acc,
             )
         }
     }
@@ -46,18 +51,20 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     init {
         // The type safer builders add modifiers to ownModifiers, so we construct a virtual parent modifier,
         // run the builder again and set our inheritedModifiers to the virtual parent's ownModifiers
-        inheritedModifiers = when {
-            modifiersFromParent != null -> {
-                val virtualParentModifier = ModifierChain()
-                modifiersFromParent.invoke(virtualParentModifier)
-                virtualParentModifier.ownModifiers
+        inheritedModifiers =
+            when {
+                modifiersFromParent != null -> {
+                    val virtualParentModifier = ModifierChain()
+                    modifiersFromParent.invoke(virtualParentModifier)
+                    virtualParentModifier.ownModifiers
+                }
+                else -> arrayListOf()
             }
-            else -> arrayListOf()
-        }
     }
 
     abstract class ChainableModifier {
         open var order: Int = 0
+
         abstract fun addToChain(acc: String): String
     }
 
@@ -94,8 +101,7 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     }
 
     class PaintVectorPaint(var drawableIntPath: String) : ChainableModifier() {
-        override fun addToChain(acc: String) =
-                acc + ".paint".args("VectorPainter".args("vectorResource".args(drawableIntPath)))
+        override fun addToChain(acc: String) = acc + ".paint".args("VectorPainter".args("vectorResource".args(drawableIntPath)))
     }
 
     class CustomModSeparator() : ChainableModifier() {
@@ -115,25 +121,27 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     fun cornerRadius(radius: Float) = if (radius != 0f) ownModifiers.add(CornerRadius(radius)) else false
 
     class RectangleCornerRadius(
-            val topLeftRadius: Double,
-            val topRightRadius: Double,
-            val bottomRightRadius: Double,
-            val bottomLeftRadius: Double
+        val topLeftRadius: Double,
+        val topRightRadius: Double,
+        val bottomRightRadius: Double,
+        val bottomLeftRadius: Double,
     ) : ChainableModifier() {
-        //Should be before shadow
+        // Should be before shadow
         override var order = -1000
 
         override fun addToChain(acc: String): String =
-                "$acc.clip".args("RoundedCornerShape".args("$topLeftRadius.dp, $topRightRadius.dp, $bottomRightRadius.dp, $bottomLeftRadius.dp"))
+            "$acc.clip".args(
+                "RoundedCornerShape".args("$topLeftRadius.dp, $topRightRadius.dp, $bottomRightRadius.dp, $bottomLeftRadius.dp"),
+            )
     }
 
     fun rectangleCornerRadius(
-            topLeftRadius: Double,
-            topRightRadius: Double,
-            bottomLeftRadius: Double,
-            bottomRightRadius: Double,
-            simplifyToCornerRadiusIfEqual: Boolean = true,
-            omitIfAllZero: Boolean = true,
+        topLeftRadius: Double,
+        topRightRadius: Double,
+        bottomLeftRadius: Double,
+        bottomRightRadius: Double,
+        simplifyToCornerRadiusIfEqual: Boolean = true,
+        omitIfAllZero: Boolean = true,
     ) {
         if (topLeftRadius == topRightRadius && topRightRadius == bottomRightRadius && bottomRightRadius == bottomLeftRadius) {
             if (omitIfAllZero && topLeftRadius == 0.0) return
@@ -143,27 +151,29 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
             }
         }
         ownModifiers.add(
-                RectangleCornerRadius(
-                        topLeftRadius,
-                        topRightRadius,
-                        bottomLeftRadius,
-                        bottomRightRadius
-                )
+            RectangleCornerRadius(
+                topLeftRadius,
+                topRightRadius,
+                bottomLeftRadius,
+                bottomRightRadius,
+            ),
         )
     }
 
     class LinearGradientBackground(
-            var stops: Array<ColorStop>,
-            var width: Float,
-            var gradientTransform: ArrayList<ArrayList<Double>>? = null
+        var stops: Array<ColorStop>,
+        var width: Float,
+        var gradientTransform: ArrayList<ArrayList<Double>>? = null,
     ) : ChainableModifier() {
-        override fun addToChain(acc: String) = acc + ".background".args(
-                "Brush.horizontalGradient".args(
+        override fun addToChain(acc: String) =
+            acc +
+                ".background".args(
+                    "Brush.horizontalGradient".args(
                         stops.joinToString { "${it.position}f to ${it.color?.toComposeColor()}" },
                         "startX = 0f",
-                        "endX = ${width}.dp.value.toFloat()"
+                        "endX = $width.dp.value.toFloat()",
+                    ),
                 )
-        )
     }
 
     class Border() : ChainableModifier() {
@@ -176,7 +186,6 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
 
     class ConstrainAs(val tagName: String, val composeConstraintCode: String) : ChainableModifier() {
         override fun addToChain(acc: String): String {
-
             return "$acc.constrainAs".args(tagName).body(composeConstraintCode)
         }
     }
@@ -187,7 +196,11 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
      * Recommended to removeSizeModifiers, as the existing size modifiers will keep this composable at its literal dimensions
      * in the design
      */
-    fun constrainAs(tagName: String, composeConstraintCode: String, removeSizeModifiers: Boolean = true) {
+    fun constrainAs(
+        tagName: String,
+        composeConstraintCode: String,
+        removeSizeModifiers: Boolean = true,
+    ) {
         ownModifiers.add(ConstrainAs(tagName, composeConstraintCode))
         if (removeSizeModifiers) ownModifiers.removeIf { it is Width || it is Height || it is Size }
     }
@@ -203,20 +216,27 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
         override fun addToChain(acc: String): String {
             val combinedModifiers = (modifierChain.ownModifiers + modifierChain.inheritedModifiers)
             val firstCornerRadius: CornerRadius? = combinedModifiers.firstOrNull { it is CornerRadius } as CornerRadius?
-            val firstRectangleCornerRadius: RectangleCornerRadius? = combinedModifiers.firstOrNull { it is RectangleCornerRadius } as RectangleCornerRadius?
-            val shadowShape = when {
-                firstRectangleCornerRadius != null -> with(firstRectangleCornerRadius) {
-                    "shape = ${"RoundedCornerShape".args("$topLeftRadius.dp, $topRightRadius.dp, $bottomRightRadius.dp, $bottomLeftRadius.dp")}"
+            val firstRectangleCornerRadius: RectangleCornerRadius? =
+                combinedModifiers.firstOrNull {
+                    it is RectangleCornerRadius
+                } as RectangleCornerRadius?
+            val shadowShape =
+                when {
+                    firstRectangleCornerRadius != null ->
+                        with(firstRectangleCornerRadius) {
+                            "shape = ${"RoundedCornerShape".args(
+                                "$topLeftRadius.dp, $topRightRadius.dp, $bottomRightRadius.dp, $bottomLeftRadius.dp",
+                            )}"
+                        }
+                    firstCornerRadius != null -> "shape = ${"RoundedCornerShape".args(firstCornerRadius.radius.toDouble().roundedDp())}"
+                    else -> ""
                 }
-                firstCornerRadius != null -> "shape = ${"RoundedCornerShape".args(firstCornerRadius.radius.toDouble().roundedDp())}"
-                else -> ""
-            }
-            if (Settings.Optimizations.avoidAndroidShadowOptimization)
+            if (Settings.Optimizations.avoidAndroidShadowOptimization) {
                 return "$acc.shadow".args("$dp.dp", "opacity = 0.99f", shadowShape)
+            }
             return "$acc.shadow".args("$dp.dp", shadowShape)
         }
     }
-
 
     class Gravity(var alignment: AlignmentOption) : ChainableModifier() {
         override fun addToChain(acc: String) = acc + ".align(Alignment.${alignment.name})"
@@ -227,12 +247,13 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     }
 
     class WrapContentSize() : ChainableModifier() {
-
         override fun addToChain(acc: String): String = "$acc.wrapContentSize".args()
     }
 
     enum class Alignment {
-        CenterVertically, Top, Bottom
+        CenterVertically,
+        Top,
+        Bottom,
     }
 
     class WrapContentHeight(val alignment: Alignment) : ChainableModifier() {
@@ -246,6 +267,7 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
      */
     class ClassProperties() : ChainableModifier() {
         override var order: Int = -100000
+
         override fun addToChain(acc: String): String = "modifier"
     }
 
@@ -257,7 +279,10 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
 
     fun drawOpacity(amount: Float) = ownModifiers.add(DrawOpacity(amount))
 
-    fun size(widthDp: Number, heightDp: Number) = ownModifiers.add(Size(widthDp, heightDp))
+    fun size(
+        widthDp: Number,
+        heightDp: Number,
+    ) = ownModifiers.add(Size(widthDp, heightDp))
 
     fun preferredWidth(widthDp: Number) = ownModifiers.add(Width(widthDp))
 
@@ -268,70 +293,76 @@ class ModifierChain(modifiersFromParent: (ModifierChain.() -> Unit)? = null) {
     fun paintVectorPaint(drawableIntPath: String) = ownModifiers.add(PaintVectorPaint(drawableIntPath))
 
     fun linearGradientBackground(
-            stops: Array<ColorStop>,
-            width: Float,
-            gradientTransform: ArrayList<ArrayList<Double>>? = null
+        stops: Array<ColorStop>,
+        width: Float,
+        gradientTransform: ArrayList<ArrayList<Double>>? = null,
     ) = ownModifiers.add(LinearGradientBackground(stops, width, gradientTransform))
 
     fun none() = ownModifiers.add(None())
 
     fun shadow(dp: Float) = ownModifiers.add(Shadow(dp, this))
 
-
     fun gravity(alignment: AlignmentOption) = ownModifiers.add(Gravity(alignment))
 
-    fun referredSize(widthDp: Number, heightDp: Number) = Size(widthDp, heightDp)
+    fun referredSize(
+        widthDp: Number,
+        heightDp: Number,
+    ) = Size(widthDp, heightDp)
 
-    fun background(color: RGBA, opacityOverride: Float? = null) =
-            ownModifiers.add(Background(color, opacityOverride))
+    fun background(
+        color: RGBA,
+        opacityOverride: Float? = null,
+    ) = ownModifiers.add(Background(color, opacityOverride))
 
     fun customModSeparator() = ownModifiers.add(CustomModSeparator())
+
     fun addPassedProperties() = ownModifiers.add(ClassProperties())
 
     fun addStyleMods(node: BaseNodeMixin) {
         if (node is GeometryMixin) {
             node.fills
-                    ?.filter { it.visible }
-                    ?.forEach { fill ->
-                        when {
-                            //Different gradient types share the same Kotlin type, so for now look at fill.type
-                            fill.type == "GRADIENT_LINEAR" -> with(fill as GradientPaint) {
+                ?.filter { it.visible }
+                ?.forEach { fill ->
+                    when {
+                        // Different gradient types share the same Kotlin type, so for now look at fill.type
+                        fill.type == "GRADIENT_LINEAR" ->
+                            with(fill as GradientPaint) {
                                 linearGradientBackground(
-                                        this.gradientStops ?: arrayOf(), (node as LayoutMixin).width.toFloat()
+                                    this.gradientStops ?: arrayOf(),
+                                    (node as LayoutMixin).width.toFloat(),
                                 )
                             }
-                            fill is SolidPaint -> background(fill.color, fill.opacity.toFloat())
-                        }
+                        fill is SolidPaint -> background(fill.color, fill.opacity.toFloat())
                     }
+                }
         }
         if (node is BlendMixin) {
             node.effects?.forEach { effect ->
                 when (effect) {
-                    is ShadowEffect -> shadow(
+                    is ShadowEffect ->
+                        shadow(
                             effect.radius?.toFloat()
-                                    ?: throw java.lang.Exception("Has shadow effect but shadow effect has null radius")
-                    )
+                                ?: throw java.lang.Exception("Has shadow effect but shadow effect has null radius"),
+                        )
                 }
             }
         }
         if (node is RectangleCornerMixin) {
             rectangleCornerRadius(
-                    node.topLeftRadius,
-                    node.topRightRadius,
-                    node.bottomLeftRadius,
-                    node.bottomRightRadius
+                node.topLeftRadius,
+                node.topRightRadius,
+                node.bottomLeftRadius,
+                node.bottomRightRadius,
             )
         } else if (node is CornerMixin) {
             cornerRadius(node.cornerRadius.toFloat())
         }
     }
 
-
     enum class AlignmentOption() {
         Start,
         End,
         CenterHorizontally,
-        CenterVertically
+        CenterVertically,
     }
-
 }

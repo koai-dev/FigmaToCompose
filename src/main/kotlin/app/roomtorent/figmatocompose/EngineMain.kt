@@ -33,17 +33,17 @@ object EngineMain {
     }
 }
 
-//fun main() {
+// fun main() {
 //    embeddedServer(Jetty, port = 8080, host = "0.0.0.0", watchPaths = listOf("classes")) {
 //
 //    }.start(true)
-//}
+// }
 
 @Suppress("KDocMissingDocumentation")
 @Deprecated(
     "Use EngineMain instead",
     replaceWith = ReplaceWith("EngineMain"),
-    level = DeprecationLevel.HIDDEN
+    level = DeprecationLevel.HIDDEN,
 )
 object DevelopmentEngine {
     @JvmStatic

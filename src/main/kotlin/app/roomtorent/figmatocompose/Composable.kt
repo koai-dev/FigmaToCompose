@@ -14,7 +14,10 @@ abstract class Composable() {
     override fun toString() = getAsString()
 
     private fun getAsString(content: String? = null): String {
-        return if(content != null) name.args("")
-        else name.args("").body(content.toString())
+        return if (content != null) {
+            name.args("")
+        } else {
+            name.args("").body(content.toString())
+        }
     }
 }
