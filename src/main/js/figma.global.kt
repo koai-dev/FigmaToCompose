@@ -1,4 +1,10 @@
-@file:Suppress("INTERFACE_WITH_SUPERCLASS", "OVERRIDING_FINAL_MEMBER", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "CONFLICTING_OVERLOADS", "EXTERNAL_DELEGATION")
+@file:Suppress(
+    "INTERFACE_WITH_SUPERCLASS",
+    "OVERRIDING_FINAL_MEMBER",
+    "RETURN_TYPE_MISMATCH_ON_OVERRIDE",
+    "CONFLICTING_OVERLOADS",
+    "EXTERNAL_DELEGATION"
+)
 
 import kotlin.js.*
 
@@ -24,125 +30,10 @@ external interface PluginAPI {
     var currentPage: PageNode
 
 
-
     var mixed: Any
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     var hasMissingFont: Boolean
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
@@ -179,11 +70,6 @@ external interface OnMessageProperties {
 }
 
 external interface UIAPI {
-
-
-
-
-
 
 
 }
@@ -559,11 +445,6 @@ external interface BaseNodeMixin {
     var removed: Boolean
 
 
-
-
-
-
-
 }
 
 external interface SceneNodeMixin {
@@ -573,34 +454,6 @@ external interface SceneNodeMixin {
 
 external interface ChildrenMixin {
     var children: Array<dynamic /* SliceNode | FrameNode | GroupNode | ComponentNode | InstanceNode | BooleanOperationNode | VectorNode | StarNode | LineNode | EllipseNode | PolygonNode | RectangleNode | TextNode */>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
@@ -681,17 +534,17 @@ external interface ExportMixin {
     var exportSettings: Array<dynamic /* ExportSettingsImage | ExportSettingsSVG | ExportSettingsPDF */>
 
 
-
-
 }
 
 external interface ReactionMixin {
     var reactions: Array<Reaction>
 }
 
-external interface DefaultShapeMixin : BaseNodeMixin, SceneNodeMixin, ReactionMixin, BlendMixin, GeometryMixin, LayoutMixin, ExportMixin
+external interface DefaultShapeMixin : BaseNodeMixin, SceneNodeMixin, ReactionMixin, BlendMixin, GeometryMixin,
+    LayoutMixin, ExportMixin
 
-external interface DefaultFrameMixin : BaseNodeMixin, SceneNodeMixin, ReactionMixin, ChildrenMixin, ContainerMixin, GeometryMixin, CornerMixin, RectangleCornerMixin, BlendMixin, ConstraintMixin, LayoutMixin, ExportMixin {
+external interface DefaultFrameMixin : BaseNodeMixin, SceneNodeMixin, ReactionMixin, ChildrenMixin, ContainerMixin,
+    GeometryMixin, CornerMixin, RectangleCornerMixin, BlendMixin, ConstraintMixin, LayoutMixin, ExportMixin {
     var layoutMode: String /* "NONE" | "HORIZONTAL" | "VERTICAL" */
     var counterAxisSizingMode: String /* "FIXED" | "AUTO" */
     var horizontalPadding: Number
@@ -713,10 +566,6 @@ external interface DefaultFrameMixin : BaseNodeMixin, SceneNodeMixin, ReactionMi
 external interface DocumentNode : BaseNodeMixin {
     var type: String /* "DOCUMENT" */
     var children: Array<PageNode>
-
-
-
-
 
 
 }
@@ -746,7 +595,8 @@ external interface FrameNode : DefaultFrameMixin {
 
 }
 
-external interface GroupNode : BaseNodeMixin, SceneNodeMixin, ReactionMixin, ChildrenMixin, ContainerMixin, BlendMixin, LayoutMixin, ExportMixin {
+external interface GroupNode : BaseNodeMixin, SceneNodeMixin, ReactionMixin, ChildrenMixin, ContainerMixin, BlendMixin,
+    LayoutMixin, ExportMixin {
     var type: String /* "GROUP" */
 
 }
@@ -827,26 +677,6 @@ external interface TextNode : DefaultShapeMixin, ConstraintMixin {
 
 
     var characters: String
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

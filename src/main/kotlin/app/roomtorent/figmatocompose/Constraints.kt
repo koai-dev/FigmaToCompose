@@ -173,11 +173,16 @@ fun childrenMixinToConstraintsLayout(
     }
     // Create references
     val constraintReferences = arrayListOf<String>()
+    var count = 0
 
     val constraintChildren: List<String> =
         node.children?.map { childNode ->
-            val constraintReference =
-                childNode.name!!.toKotlinIdentifierDecollisioned().also { constraintReferences.add(it) }
+            var constraintReference =
+                childNode.name!!.toKotlinIdentifierDecollisioned()
+            if (constraintReferences.contains(constraintReference)) {
+                constraintReference += "_${count++}"
+            }
+            constraintReferences.add(constraintReference)
             makeCompose(childNode) {
                 // Some children of a frame may not be
                 if (childNode is ConstraintMixin && childNode is LayoutMixin) {

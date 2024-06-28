@@ -224,7 +224,7 @@ fun vectorFrameToCompose(
         "contentDescription = \"\"",
         "modifier = ${
             Mods(extraModifiers = extraModifiers) {
-                size(node.width, node.height)
+                size(node.width.roundTo(0), node.height.roundTo(0))
                 addStyleMods(node)
             }
         }",
@@ -275,8 +275,8 @@ fun makeCompose(
                 Box(${
                     Mods(extraModifiers) {
                         size(
-                            width,
-                            height,
+                            width.roundTo(0),
+                            height.roundTo(0),
                         )
                         addStyleMods(node)
                     }
@@ -326,7 +326,7 @@ fun makeCompose(
 
                                         else -> throw Exception("Horizontal text alignment type ${this.textAlignHorizontal} is new to me")
                                     },
-                                "fontSize = ${node.fontSize}.sp",
+                                "fontSize = ${node.fontSize.roundTo(0)}.sp",
                             ),
                             escapeCharacters = false,
                         )
