@@ -69,14 +69,31 @@ fun getComposeConstraintAndSizeCode(
                 height = Dimension.fillToConstraints
             """.replaceIndent("   ")
             }
+
             else -> null
         }
 
     return conciseEquivalent ?: {
         val (composeHorizontalConstraint: String, composeWidth: String) =
-            getComposeConstraintAndSize(constraintSet.horizontal, childWidth, child.x, parent.width, "start", "end", "Horizontal")
+            getComposeConstraintAndSize(
+                constraintSet.horizontal,
+                childWidth,
+                child.x,
+                parent.width,
+                "start",
+                "end",
+                "Horizontal",
+            )
         val (composeVerticalConstraint: String, composeHeight: String) =
-            getComposeConstraintAndSize(constraintSet.vertical, childHeight, child.y, parent.height, "top", "bottom", "Vertical")
+            getComposeConstraintAndSize(
+                constraintSet.vertical,
+                childHeight,
+                child.y,
+                parent.height,
+                "top",
+                "bottom",
+                "Vertical",
+            )
         """
         $composeHorizontalConstraint
         $composeVerticalConstraint
@@ -101,7 +118,11 @@ private fun getComposeConstraintAndSize(
 //          Most X or Y / Bottom or Right
         Constraint.MAX -> {
             composeDimensionSize = "Dimension.value".args(childSizeInDimension.roundedDp())
-            composeConstraint = "$maxName.linkTo".args("parent.$maxName", (parentSizeInDimension - (childSizeInDimension + childPositionOnDimension)).roundedDp())
+            composeConstraint =
+                "$maxName.linkTo".args(
+                    "parent.$maxName",
+                    (parentSizeInDimension - (childSizeInDimension + childPositionOnDimension)).roundedDp(),
+                )
         }
 //          Least X or Y / Top or Left
         Constraint.MIN -> {
@@ -112,7 +133,8 @@ private fun getComposeConstraintAndSize(
         Constraint.SCALE -> {
             var bias = (childPositionOnDimension / (parentSizeInDimension - childSizeInDimension))
             if (bias.isNaN()) bias = 0.5
-            composeDimensionSize = "Dimension.percent".args("${(childSizeInDimension / parentSizeInDimension).roundedForHuman()}f")
+            composeDimensionSize =
+                "Dimension.percent".args("${(childSizeInDimension / parentSizeInDimension).roundedForHuman()}f")
             composeConstraint = "linkTo(parent.$minName, parent.$maxName, bias = ${bias.roundedForHuman()}f)"
         }
 //          Fixed Margins
@@ -120,9 +142,15 @@ private fun getComposeConstraintAndSize(
             composeConstraint =
                 """
                 ${"$minName.linkTo".args("parent.$minName", childPositionOnDimension.roundedDp())}
-                ${"$maxName.linkTo".args("parent.$maxName", (parentSizeInDimension - (childSizeInDimension + childPositionOnDimension)).roundedDp())}
+                ${
+                    "$maxName.linkTo".args(
+                        "parent.$maxName",
+                        (parentSizeInDimension - (childSizeInDimension + childPositionOnDimension)).roundedDp(),
+                    )
+                }
                 """.trimIndent()
-            composeDimensionSize = "Dimension.percent".args("${(childSizeInDimension / parentSizeInDimension).roundedForHuman()}f")
+            composeDimensionSize =
+                "Dimension.percent".args("${(childSizeInDimension / parentSizeInDimension).roundedForHuman()}f")
         }
 //          Unspecified with - position in center
         Constraint.CENTER -> {
@@ -148,11 +176,15 @@ fun childrenMixinToConstraintsLayout(
 
     val constraintChildren: List<String> =
         node.children?.map { childNode ->
-            val constraintReference = childNode.name!!.toKotlinIdentifierDecollisioned().also { constraintReferences.add(it) }
+            val constraintReference =
+                childNode.name!!.toKotlinIdentifierDecollisioned().also { constraintReferences.add(it) }
             makeCompose(childNode) {
                 // Some children of a frame may not be
                 if (childNode is ConstraintMixin && childNode is LayoutMixin) {
-                    constrainAs(constraintReference, getComposeConstraintAndSizeCode(node, childNode, constraintReference))
+                    constrainAs(
+                        constraintReference,
+                        getComposeConstraintAndSizeCode(node, childNode, constraintReference),
+                    )
                 } else {
                     throw Exception("All children of a frame are expected to have constraints")
                 }

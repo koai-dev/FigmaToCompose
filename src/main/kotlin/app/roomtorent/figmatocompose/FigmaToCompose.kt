@@ -85,7 +85,7 @@ fun Application.main() {
                         fillMaxSize()
                     }.removeNoAffectPatterns()
 
-                val identifier = (convertRequest.rootiestNode?.name ?: "unnamed").toKotlinIdentifierDecollisioned()
+                val identifier = (convertRequest.rootiestNode?.name ?: "unnamed").toKotlinIdentifierScopeFuncName()
 
                 val joinedComposables = composables.values.joinToString(separator = "\n")
                 val upperMostComposable =
@@ -154,13 +154,25 @@ fun String.toKotlinIdentifierDecollisioned(): String {
     return if (attempts > 0) changed + "_" + attempts else changed
 }
 
+fun String.toKotlinIdentifierScopeFuncName(): String {
+    val original = this
+    val changed =
+        this.cleanValue().replace("_", "")
+    var matches = decollisionMap.getOrPut(changed) { original } == original
+    var attempts = 0
+    while (!matches) {
+        matches = decollisionMap.getOrPut(changed + "_" + attempts++) { original } == original
+    }
+    return if (attempts > 0) changed + "_" + attempts else changed
+}
+
 fun String.toKotlinIdentifier(): String = this.replace(Regex("[\\s-/,.()?+$\\[\\]:!\"\'{}`<>]"), "_")
 
 var composables: HashMap<String, String> = hashMapOf()
 
 fun defineComponentFromFrameMixin(node: DefaultFrameMixin): String {
     val name = node.name ?: "unnamed"
-    val identifier = name.toKotlinIdentifierDecollisioned()
+    val identifier = name.toKotlinIdentifierScopeFuncName()
     composables[identifier] =
         """
         @Composable()
